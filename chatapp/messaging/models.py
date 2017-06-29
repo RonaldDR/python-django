@@ -22,11 +22,13 @@ class Message(models.Model):
 	objects = MessageManager()
 
 	def __str__(self):
-		return ('sender: {} \n thread: {} \n content: {} \n date: {} \n '.format(self.sender, self.thread, self.content, self.when))
+		return ('sender: {}  thread: {}  content: {}  date: {} \n '.format(self.sender, self.thread, self.content, self.when))
 
 class Profile(models.Model):
 	owner = models.OneToOneField(User, related_name = 'owner')
 	# message = models.ForeignKey(Message, related_name = '_message')
 	thread = models.ForeignKey(MessageThread, related_name = '_thread')
 	is_removed = models.BooleanField()
-	
+
+	def __str__(self):
+		return ('owner: {}  thread: {} is_removed: {} \n'.format(self.owner, self.thread,self.is_removed))

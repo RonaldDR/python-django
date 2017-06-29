@@ -33,18 +33,30 @@ class MessageThreadModelTestCase(TestCase):
 
     def test_message_create(self):
         """Test creating of message. Find a way to refer `sender`, `content`, `when`"""
-        thread = MessageThread.objects.create(subject= 'CMSC 126')
-        Message.objects.add_message(sender=self.user1, content="Guys, let's eat!", thread=thread)
+        thread1 = MessageThread.objects.create(subject= 'CMSC 126')
+        thread2 = MessageThread.objects.create(subject = 'CMSC 105')
+        Message.objects.add_message(sender=self.user1, content="Guys, let's eat!", thread=thread1)
         self.assertEqual(Message.objects.count(), 1)
 
         # To reply
-        Message.objects.add_message(sender=self.user2, content='Alright!',thread=thread)
+        Message.objects.add_message(sender=self.user2, content='Alright!',thread=thread1)
         self.assertEqual(Message.objects.count(), 2)
 
-        Message.objects.add_message(sender=self.user2, content='Alright!',thread=thread)
+        Message.objects.add_message(sender=self.user2, content='Alright!',thread=thread1)
         self.assertEqual(Message.objects.count(), 3)
 
-        print (Message.objects.all())
+        Message.objects.add_message(sender=self.user1, content="Guys, let's study!", thread=thread2)
+        self.assertEqual(Message.objects.count(), 4)
+
+        # To reply
+        Message.objects.add_message(sender=self.user2, content='Alrighty!',thread=thread2)
+        self.assertEqual(Message.objects.count(), 5)
+
+        Message.objects.add_message(sender=self.user2, content='Alrighty!',thread=thread2)
+        self.assertEqual(Message.objects.count(), 6)
+
+        print (Message.objects.all().filter(thread = thread1))
+        print (Message.objects.all().filter(thread = thread2))
 
     def test_message_copy(self):
         """Test creating of message now providing a copy to each recipient.
@@ -54,8 +66,11 @@ class MessageThreadModelTestCase(TestCase):
         thread = MessageThread.objects.create(subject= 'CMSC 126')
         person1 = Profile.objects.create(owner= self.user1, thread = thread, is_removed = False)
         self.assertTrue(person1.is_removed == False)
+        print (person1)
         person1.is_removed = True 
         self.assertTrue(person1.is_removed == True)
+
+        print (person1)
     
     # def tearDown(self):
     #     self.user1.dispose()
