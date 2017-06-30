@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import MessageThread,Message, Profile
+from .models import MessageThread,Message, Profile, ProfileThread
 from django.test import TestCase
 from datetime import timedelta
 from django.utils import timezone
@@ -77,12 +77,24 @@ class MessageThreadModelTestCase(TestCase):
         When a message is marked removed we don't really remove the Message
         instance but only the user's copy of that instance.
         A user copy may have `owner`, `message`, `thread` and a boolean `is_removed`"""
-        thread = MessageThread.objects.create(subject= 'CMSC 126')
-        person1 = Profile.objects.create(owner= self.user1, thread = thread, is_removed = False)
-        self.assertTrue(person1.is_removed == False)
-        person1.is_removed = True 
-        self.assertTrue(person1.is_removed == True)
+        thread1 = MessageThread.objects.create(subject= 'CMSC 126')
+        self.assertEqual(MessageThread.objects.count(), 1)
 
-        # print (person1)
-        # pass
-    
+        thread2 = MessageThread.objects.create(subject = 'CMSC 105')
+
+        person1 = Profile.objects.create(owner = self.user1)
+        person2 = Profile.objects.create(owner = self.user2)
+
+        pf1 = ProfileThread(user = person1, thread = thread1, 
+            is_removed = False)
+        pf2 = ProfileThread(user = person2, thread = thread1, 
+            is_removed = False)
+        pf3 = ProfileThread(user = person1, thread = thread2, 
+            is_removed = False)
+        pf4 = ProfileThread(user = person2, thread = thread2, 
+            is_removed = False)
+
+        self.assertTrue(pf1.thread.subject == 'CMSC 126')
+        self.assertTrue(pf3.thread.subject == 'CMSC 105')
+
+        self.assertEqual(MessageThread.objects.count(), 2)
